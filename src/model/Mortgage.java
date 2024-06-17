@@ -13,15 +13,15 @@ public class Mortgage {
     }
 
     public double getRealEstateValue(){
-        return realEstateValue;
+        return this.realEstateValue;
     }
 
     public double getAnnualPercentageRate(){
-        return annualPercentageRate;
+        return this.annualPercentageRate;
     }
 
     public int getLoanTerm(){
-        return loanTerm;
+        return this.loanTerm;
     }
 
     public double getMonthlyPayment(){

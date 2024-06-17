@@ -2,9 +2,8 @@ package util;
 
 import java.util.Scanner;
 
-/*TODO  - Adicionar localização do scanner
-        - Otimizar código para tentar instanciar scanner uma vez só
-*/
+//TODO - Adicionar localização do scanner
+//TODO - Definir regras de negócios
 
 public class UserInterface {
 
@@ -15,22 +14,68 @@ public class UserInterface {
     }
 
     public void closeScanner(){
-        if(scan != null)
+        if(this.scan != null)
             this.scan.close();
     }
 
     public double getUserRealEstateValue(){
-        System.out.print("Digite o valor do imóvel: R$");
-        return this.scan.nextDouble();
+        boolean valid;
+        double value;
+
+        do{
+            valid = true;
+
+            System.out.print("Digite o valor do imóvel: R$");
+            value = this.scan.nextDouble();
+
+            if (value < 0){
+                valid = false;
+                System.out.print("Valor inválido!!!\n\n");
+            }
+
+        } while (!valid);
+
+        return value;
     }
 
     public double getUserAnnualPercentageRate(){
-        System.out.print("Digite o valor da taxa de juros (anual):");
-        return this.scan.nextDouble();
+        boolean valid;
+        double rate;
+
+        do{
+            valid = true;
+
+            System.out.print("Digite o valor da taxa de juros (anual):");
+            rate = this.scan.nextDouble();
+
+            //TODO - Tratar cada regra individualmente
+            if (rate < 0 || rate > 1000){
+                valid = false;
+                System.out.print("Valor inválido!!!\n\n");
+            }
+
+        } while (!valid);
+
+        return rate;
     }
 
     public int getUserLoanTerm(){
-        System.out.print("Digite o prazo de financiamento (anos):");
-        return this.scan.nextInt();
+        boolean valid;
+        int term;
+
+        do{
+            valid = true;
+
+            System.out.print("Digite o prazo de financiamento (anos):");
+            term = this.scan.nextInt();
+
+            if (term < 0){
+                valid = false;
+                System.out.print("Valor inválido!!!\n\n");
+            }
+
+        } while (!valid);
+
+        return term;
     }
 }
