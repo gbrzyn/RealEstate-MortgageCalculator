@@ -1,3 +1,5 @@
+package util;
+
 import java.util.Scanner;
 
 /*TODO  - Adicionar localização do scanner
@@ -6,33 +8,29 @@ import java.util.Scanner;
 
 public class UserInterface {
 
-    Scanner scan;
+    private Scanner scan;
 
-    void startScanner(){
-        scan = new Scanner(System.in);
+    public UserInterface(){
+        this.scan = new Scanner(System.in);
     }
 
-    void closeScanner(){
+    public void closeScanner(){
         if(scan != null)
-            scan.close();
+            this.scan.close();
     }
 
-    double getRealEstateValue(){
+    public double getUserRealEstateValue(){
         System.out.print("Digite o valor do imóvel: R$");
-        return scan.nextDouble();
+        return this.scan.nextDouble();
     }
 
-    double getAnnualPercentageRate(){
-        Scanner scan = new Scanner(System.in);
-
+    public double getUserAnnualPercentageRate(){
         System.out.print("Digite o valor da taxa de juros (anual):");
-        return scan.nextDouble();
+        return this.scan.nextDouble();
     }
 
-    int getLoanTerm(){
-        Scanner scan = new Scanner(System.in);
-
+    public int getUserLoanTerm(){
         System.out.print("Digite o prazo de financiamento (anos):");
-        return scan.nextInt();
+        return this.scan.nextInt();
     }
 }
