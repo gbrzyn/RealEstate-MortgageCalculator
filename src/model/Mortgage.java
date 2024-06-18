@@ -28,17 +28,20 @@ public class Mortgage {
         return (this.realEstateValue / (this.loanTerm * 12)) * (1 + (this.annualPercentageRate / 12));
     }
 
-    public double getTotalMortgagePayment(){
+    public double getTotalPayment(){
         return (this.getMonthlyPayment() * 12) * this.loanTerm;
     }
 
-    public void printMortgageInfo(){
-        System.out.print("\n\n");
-        System.out.printf("Valor do imóvel: R$%.2f\n", this.getRealEstateValue());
-        System.out.printf("Taxa de juros: %.2f%%\n", this.getAnnualPercentageRate());
-        System.out.printf("Prazo de financiamento: %d anos\n", this.getLoanTerm());
-        System.out.print("\n");
-        System.out.printf("Valor total do financiamento: R$%.2f\n", this.getTotalMortgagePayment());
-        System.out.printf("Valor da mensalidade: R$%.2f\n", this.getMonthlyPayment());
+    public void printInfo(){
+        System.out.println("\n");
+        System.out.println("Dados de Cadastro");
+        System.out.println("------------------------------");
+        System.out.printf("Imóvel: R$%.2f\n", this.getRealEstateValue());
+        System.out.printf("Juros: %.2f%% a.a.\n", this.getAnnualPercentageRate());
+        System.out.printf("Prazo: %d anos\n\n", this.getLoanTerm());
+        System.out.println("Dados de Financiamento");
+        System.out.println("------------------------------");
+        System.out.printf("Mensalidade: R$%.2f\n", this.getMonthlyPayment());
+        System.out.printf("Total Financiado: R$%.2f\n", this.getTotalPayment());
     }
 }

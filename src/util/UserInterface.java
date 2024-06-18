@@ -2,9 +2,6 @@ package util;
 
 import java.util.Scanner;
 
-//TODO - Adicionar localização do scanner
-//TODO - Definir regras de negócios
-
 public class UserInterface {
 
     private Scanner scan;
@@ -25,12 +22,12 @@ public class UserInterface {
         do{
             valid = true;
 
-            System.out.print("Digite o valor do imóvel: R$");
+            System.out.print("\nDigite o valor do imóvel: R$");
             value = this.scan.nextDouble();
 
             if (value < 0){
+                System.out.print("Valor inválido! Digite um valor positivo.\n");
                 valid = false;
-                System.out.print("Valor inválido!!!\n\n");
             }
 
         } while (!valid);
@@ -45,13 +42,16 @@ public class UserInterface {
         do{
             valid = true;
 
-            System.out.print("Digite o valor da taxa de juros (anual):");
+            System.out.print("\nDigite a taxa de juros (anual):");
             rate = this.scan.nextDouble();
 
-            //TODO - Tratar cada regra individualmente
-            if (rate < 0 || rate > 1000){
+            if (rate < 0){
+                System.out.print("Taxa inválida! Digite uma taxa positiva.\n");
                 valid = false;
-                System.out.print("Valor inválido!!!\n\n");
+            }
+            else if (rate > 100){
+                System.out.print("Não é permitido taxas maiores que 100% a.a.!\n");
+                valid = false;
             }
 
         } while (!valid);
@@ -66,12 +66,16 @@ public class UserInterface {
         do{
             valid = true;
 
-            System.out.print("Digite o prazo de financiamento (anos):");
+            System.out.print("\nDigite o prazo de financiamento (anos):");
             term = this.scan.nextInt();
 
             if (term < 0){
+                System.out.print("Prazo inválido! Digite um prazo positivo.\n");
                 valid = false;
-                System.out.print("Valor inválido!!!\n\n");
+            }
+            else if (term > 50){
+                System.out.print("Não é permitido prazos maiores que 50 anos!\n");
+                valid = false;
             }
 
         } while (!valid);
