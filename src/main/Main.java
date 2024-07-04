@@ -16,13 +16,10 @@ public class Main {
     final static int apartments = 2;
     final static int lands = 1;
 
-    static UserInterface user = new UserInterface();
-    static ArrayList<Mortgage> mortgages = new ArrayList<Mortgage>();
+    private static UserInterface user = new UserInterface();
+    private static ArrayList<Mortgage> mortgages = new ArrayList<Mortgage>();
 
     public static void main(String[] args) {
-        double totalRealEstatesValue = 0;
-        double totalMortgagesValue = 0;
-
         System.out.println("CADASTRO FINANCIAMENTOS");
         System.out.print("##############################");
         System.out.print("\n\n");
@@ -74,22 +71,14 @@ public class Main {
             System.out.print("\n");
 
             Mortgage mortgage = mortgages.get(i);
-
-            totalRealEstatesValue += mortgage.getRealEstateValue();
-            totalMortgagesValue += mortgage.getTotalPayment();
+            mortgage.updateTotalMortgageValues();
             mortgage.printMortgageInfo();
         }
 
-        System.out.print("\n\n");
-        System.out.println("Total Financiamentos:");
-        System.out.print("==============================");
-        System.out.print("\n\n");
-        System.out.printf("Financiamentos simulados: %d\n", mortgages.size());
-        System.out.printf("Valor total Imóveis: R$%.2f\n", totalRealEstatesValue);
-        System.out.printf("Valor total Financiado: R$%.2f\n", totalMortgagesValue);
+        Mortgage.printTotalMortgageValues(mortgages.size());
     }
 
-    static float getRandomNumber(){
-        return (float) ((int) (Math.random() * 1000) + 1) / 1000;
+    private static float getRandomNumber() {
+        return (float) ((int)(Math.random() * 1000) + 1) / 1000;
     }
 }
