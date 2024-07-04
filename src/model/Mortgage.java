@@ -20,16 +20,14 @@ public class Mortgage {
         return this.annualPercentageRate;
     }
 
-    public double getDecimalAPR(){
-        return getAnnualPercentageRate() / 100;
-    }
-
     public int getLoanTerm(){
         return this.loanTerm;
     }
 
     public double getMonthlyPayment(){
         return (getRealEstateValue() / (getLoanTerm() * 12)) * (1 + (getDecimalAPR() / 12));
+    protected double getMonthlyPayment(){
+        return (getRealEstateValue() / (getLoanTerm() * 12)) * (1 + (getAnnualPercentageRate() / 12));
     }
 
     public double getTotalPayment(){

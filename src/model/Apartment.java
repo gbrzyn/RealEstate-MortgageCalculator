@@ -28,7 +28,7 @@ public class Apartment extends Mortgage{
     //  Formula:
     //      PMT = PV * (((1 + i) ^ n) * i) / (((1 + i) ^ n) - 1 )
     public double getMonthlyPayment(){
-        var rate = getDecimalAPR() / 12;
+        var rate = getAnnualPercentageRate() / 12;
         var period = getLoanTerm() * 12;
 
         return getRealEstateValue() * (Math.pow((1 + rate), period) * rate) / (Math.pow((1 + rate), period) - 1);

@@ -54,9 +54,10 @@ public class UserInterface {
                 valid = false;
             }
 
-        } while (!valid);
 
         return rate;
+        //  Convert to decimal
+        return rate / 100;
     }
 
     public int getUserLoanTerm(){
