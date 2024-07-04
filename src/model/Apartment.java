@@ -2,8 +2,21 @@ package model;
 
 public class Apartment extends Mortgage{
 
-    public Apartment(double value, double rate, int term){
+    private int parkingSpace;
+    private int floor;
+
+    public Apartment(double value, double rate, int term, int parkingSpaces, int floor){
         super(value, rate, term);
+        this.parkingSpace = parkingSpaces;
+        this.floor = floor;
+    }
+
+    public int getParkingSpaces(){
+        return this.parkingSpace;
+    }
+
+    public int getFloor(){
+        return this.floor;
     }
 
     //  PRICE Amortization Method:
