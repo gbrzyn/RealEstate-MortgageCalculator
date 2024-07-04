@@ -53,6 +53,7 @@ public class UserInterface {
                 System.out.print("Não é permitido taxas maiores que 100% a.a.!\n");
                 valid = false;
             }
+        } while (valid);
 
         //  Convert to decimal
         return rate / 100;
