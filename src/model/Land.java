@@ -9,6 +9,13 @@ public class Land extends Mortgage{
         this.zoning = zoning;
     }
 
+    @Override
+    //  Insurance:
+    //      Monthly Payment += 2%
+    public double getMonthlyPayment(){
+        return super.getMonthlyPayment() * 1.02;
+    }
+
     public String getZoning(){
         return this.zoning;
     }
@@ -18,12 +25,5 @@ public class Land extends Mortgage{
         System.out.printf("Zona: %s \n", this.getZoning());
 
         super.printPaymentInfo();
-    }
-
-    @Override
-    //  Insurance:
-    //      Monthly Payment += 2%
-    public double getMonthlyPayment(){
-        return super.getMonthlyPayment() * 1.02;
     }
 }

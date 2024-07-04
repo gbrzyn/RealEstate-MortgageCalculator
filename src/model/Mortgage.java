@@ -15,6 +15,34 @@ public abstract class Mortgage {
         this.loanTerm = term;
     }
 
+    public abstract void printMortgageInfo();
+
+    public static double getTotalRealEstateValues(){
+        return totalRealEstateValues;
+    }
+
+    public static double getTotalMortgagePayments(){
+        return totalMortgagePayments;
+    }
+
+    public static void printTotalMortgageValues(int size) {
+        System.out.print("\n\n");
+        System.out.println("Total Financiamentos:");
+        System.out.print("==============================");
+        System.out.print("\n");
+        System.out.printf("Financiamentos simulados: %d\n", size);
+        System.out.printf("Valor total Imóveis: R$%.2f\n", getTotalRealEstateValues());
+        System.out.printf("Valor total Financiado: R$%.2f\n", getTotalMortgagePayments());
+    }
+
+    private double getMortgagePayment(){
+        return (this.getMonthlyPayment() * 12) * this.loanTerm;
+    }
+
+    protected double getMonthlyPayment(){
+        return (getRealEstateValue() / (getLoanTerm() * 12)) * (1 + (getAnnualPercentageRate() / 12));
+    }
+
     public double getRealEstateValue(){
         return this.realEstateValue;
     }
@@ -25,27 +53,6 @@ public abstract class Mortgage {
 
     public int getLoanTerm(){
         return this.loanTerm;
-    }
-
-    public static double getTotalRealEstateValues(){
-        return totalRealEstateValues;
-    }
-
-    public static double getTotalMortgagePayments(){
-        return totalMortgagePayments;
-    }
-
-    protected double getMonthlyPayment(){
-        return (getRealEstateValue() / (getLoanTerm() * 12)) * (1 + (getAnnualPercentageRate() / 12));
-    }
-
-    public double getMortgagePayment(){
-        return (this.getMonthlyPayment() * 12) * this.loanTerm;
-    }
-
-    public void updateTotalMortgageValues(){
-        totalRealEstateValues += this.getRealEstateValue();
-        totalMortgagePayments += this.getMortgagePayment();
     }
 
     protected void printPaymentInfo(){
@@ -62,15 +69,8 @@ public abstract class Mortgage {
         System.out.printf("Total Financiado: R$%.2f\n", this.getMortgagePayment());
     }
 
-    public abstract void printMortgageInfo();
-
-    public static void printTotalMortgageValues(int size) {
-        System.out.print("\n\n");
-        System.out.println("Total Financiamentos:");
-        System.out.print("==============================");
-        System.out.print("\n");
-        System.out.printf("Financiamentos simulados: %d\n", size);
-        System.out.printf("Valor total Imóveis: R$%.2f\n", getTotalRealEstateValues());
-        System.out.printf("Valor total Financiado: R$%.2f\n", getTotalMortgagePayments());
+    public void updateTotalMortgageValues(){
+        totalRealEstateValues += this.getRealEstateValue();
+        totalMortgagePayments += this.getMortgagePayment();
     }
 }

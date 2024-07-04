@@ -11,22 +11,6 @@ public class Apartment extends Mortgage{
         this.floor = floor;
     }
 
-    public int getParkingSpaces(){
-        return this.parkingSpace;
-    }
-
-    public int getFloor(){
-        return this.floor;
-    }
-
-    public void printMortgageInfo(){
-        System.out.println("Tipo: APARTAMENTO");
-        System.out.printf("Garagem: %d vagas\n", this.getParkingSpaces());
-        System.out.printf("Andar: %d°\n", this.getFloor());
-
-        super.printPaymentInfo();
-    }
-
     @Override
     //  PRICE Amortization Method:
     //      PMT = Periodic Monthly Payment
@@ -41,5 +25,21 @@ public class Apartment extends Mortgage{
         var period = getLoanTerm() * 12;
 
         return getRealEstateValue() * (Math.pow((1 + rate), period) * rate) / (Math.pow((1 + rate), period) - 1);
+    }
+
+    public int getParkingSpaces(){
+        return this.parkingSpace;
+    }
+
+    public int getFloor(){
+        return this.floor;
+    }
+
+    public void printMortgageInfo(){
+        System.out.println("Tipo: APARTAMENTO");
+        System.out.printf("Garagem: %d vagas\n", this.getParkingSpaces());
+        System.out.printf("Andar: %d°\n", this.getFloor());
+
+        super.printPaymentInfo();
     }
 }

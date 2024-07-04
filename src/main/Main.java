@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class Main {
 
     private final static int mortgageSimulations = 1;
-
     private static UserInterface user = new UserInterface();
     private static ArrayList<Mortgage> mortgages = new ArrayList<Mortgage>();
 
