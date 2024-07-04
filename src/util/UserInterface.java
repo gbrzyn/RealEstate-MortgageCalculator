@@ -54,8 +54,6 @@ public class UserInterface {
                 valid = false;
             }
 
-
-        return rate;
         //  Convert to decimal
         return rate / 100;
     }
