@@ -13,6 +13,14 @@ public class Land extends Mortgage{
         return this.zoning;
     }
 
+    public void printMortgageInfo(){
+        System.out.println("Tipo: TERRENO");
+        System.out.printf("Zona: %s \n", this.getZoning());
+
+        super.printPaymentInfo();
+    }
+
+    @Override
     //  Insurance:
     //      Monthly Payment += 2%
     public double getMonthlyPayment(){

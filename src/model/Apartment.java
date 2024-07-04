@@ -19,6 +19,15 @@ public class Apartment extends Mortgage{
         return this.floor;
     }
 
+    public void printMortgageInfo(){
+        System.out.println("Tipo: APARTAMENTO");
+        System.out.printf("Garagem: %d vagas\n", this.getParkingSpaces());
+        System.out.printf("Andar: %d°\n", this.getFloor());
+
+        super.printPaymentInfo();
+    }
+
+    @Override
     //  PRICE Amortization Method:
     //      PMT = Periodic Monthly Payment
     //      PV = Present Value

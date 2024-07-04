@@ -19,6 +19,15 @@ public class House extends Mortgage{
         return this.landArea;
     }
 
+    public void printMortgageInfo(){
+        System.out.println("Tipo: CASA");
+        System.out.printf("Área Construída: %.2f%% m²\n", this.getBuiltArea());
+        System.out.printf("Área do Terreno: %.2f%% m²\n", this.getLandArea());
+
+        super.printPaymentInfo();
+    }
+
+    @Override
     //  Insurance:
     //      Monthly Payment += $80
     public double getMonthlyPayment(){

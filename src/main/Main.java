@@ -69,14 +69,15 @@ public class Main {
 
         for (var i = 0; i < mortgages.size(); i++) {
             System.out.print("\n\n");
-            System.out.printf("Financiamento #%d:\n", i+1);
+            System.out.printf("Financiamento #%d:\n", i + 1);
             System.out.print("==============================");
+            System.out.print("\n");
 
             Mortgage mortgage = mortgages.get(i);
-            mortgage.printInfo();
 
             totalRealEstatesValue += mortgage.getRealEstateValue();
             totalMortgagesValue += mortgage.getTotalPayment();
+            mortgage.printMortgageInfo();
         }
 
         System.out.print("\n\n");
