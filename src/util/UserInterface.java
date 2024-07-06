@@ -3,16 +3,24 @@ package util;
 import model.Apartment;
 import model.House;
 import model.Land;
+
 import java.util.Scanner;
 
 public class UserInterface {
-
-    private boolean valid;
     private Scanner scan;
+    private String zoning;
 
-    public UserInterface(){
-        this.scan = new Scanner(System.in);
-    }
+    private double value;
+    private double rate;
+    private double discountRate;
+    private double builtArea;
+    private double landArea;
+
+    private int term;
+    private int parkingSpace;
+    private int floor;
+
+    public UserInterface(){ this.scan = new Scanner(System.in); }
 
     public void closeScanner(){
         if(this.scan != null)
@@ -20,262 +28,228 @@ public class UserInterface {
     }
 
     public House getUserNewHouse(){
-        double value = this.getUserMortgageRealEstateValue();
-        double rate = this.getUserMortgageAnnualPercentageRate();
-        int term = this.getUserMortgageLoanTerm();
-        double builtArea = this.getUserHouseBuiltArea();
-        double landArea = this.getUserHouseLandArea();
+        this.setDefaultValues();
 
-        return new House(value, rate, term, builtArea, landArea);
+        while(true){
+            try {
+                if(value == -1)
+                    value = this.getUserMortgageRealEstateValue(1000);
+
+                if(rate == -1)
+                    rate = this.getUserMortgageAnnualPercentageRate(1, 100);
+
+                if(discountRate == -1)
+                    discountRate = this.getUserHouseDiscountRate(0, rate * 100);
+
+                if(term == -1)
+                    term = this.getUserMortgageLoanTerm(1, 50);
+
+                if(builtArea == -1)
+                    builtArea = this.getUserHouseBuiltArea(15);
+
+                if(landArea == -1)
+                    landArea = this.getUserHouseLandArea(builtArea);
+
+                return new House(value, rate, discountRate, term, builtArea, landArea);
+
+            } catch (IllegalArgumentException | DiscountRateException e){
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public Apartment getUserNewApartment(){
-        double value = this.getUserMortgageRealEstateValue();
-        double rate = this.getUserMortgageAnnualPercentageRate();
-        int term = this.getUserMortgageLoanTerm();
-        int parkingSpace = this.getUserApartmentParkingSpace();
-        int floor = this.getUserApartmentFloor();
+        this.setDefaultValues();
 
-        return new Apartment(value, rate, term, parkingSpace, floor);
+        while(true){
+            try {
+                if(value == -1)
+                    value = this.getUserMortgageRealEstateValue(1000);
+
+                if(rate == -1)
+                    rate = this.getUserMortgageAnnualPercentageRate(1, 100);
+
+                if(term == -1)
+                    term = this.getUserMortgageLoanTerm(1, 50);
+
+                if(parkingSpace == -1)
+                    parkingSpace = this.getUserApartmentParkingSpace(15);
+
+                if(floor == -1)
+                    floor = this.getUserApartmentFloor(0, 100);
+
+                return new Apartment(value, rate, term, parkingSpace, floor);
+
+            } catch (IllegalArgumentException e){
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public Land getUserNewLand(){
-        double value = this.getUserMortgageRealEstateValue();
-        double rate = this.getUserMortgageAnnualPercentageRate();
-        int term = this.getUserMortgageLoanTerm();
-        String zoning = this.getUserLandZoning();
+        this.setDefaultValues();
 
-        return new Land(value, rate, term, zoning);
+        while(true){
+            try {
+                if(value == -1)
+                    value = this.getUserMortgageRealEstateValue(1000);
+
+                if(rate == -1)
+                    rate = this.getUserMortgageAnnualPercentageRate(1, 100);
+
+                if(term == -1)
+                    term = this.getUserMortgageLoanTerm(1, 50);
+
+                if(zoning == null)
+                    zoning = this.getUserLandZoning();
+
+                return new Land(value, rate, term, zoning);
+
+            } catch (IllegalArgumentException e){
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
-    public double getUserMortgageRealEstateValue(){
-        double value;
+    public double getUserMortgageRealEstateValue(double lowerLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite o valor do ativo: R$");
+        double value = this.scan.nextDouble();
 
-        do {
-            this.valid = true;
-
-            System.out.print("\nDigite o valor do imóvel: R$");
-            value = this.scan.nextDouble();
-
-            if (value < 0){
-                System.out.print("Valor inválido! Digite um valor positivo.\n");
-                this.valid = false;
-            }
-
-        } while (!this.valid);
+        if (validateLowerLimitOverInputValue(value, lowerLimit))
+            throw new IllegalArgumentException("Valor inválido! O valor mínimo do ativo é R$" + lowerLimit + "0.");
 
         return value;
     }
 
-    public double getUserMortgageAnnualPercentageRate(){
-        double rate;
+    public double getUserMortgageAnnualPercentageRate(double lowerLimit, double upperLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite a taxa de juros (anual): ");
+        double rate = this.scan.nextDouble();
 
-        do {
-            this.valid = true;
+        if (validateLowerLimitOverInputValue(rate, lowerLimit))
+            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.");
 
-            System.out.print("\nDigite a taxa de juros (anual):");
-            rate = this.scan.nextDouble();
+        else if (validateInputValueOverUpperLimit(rate, upperLimit))
+            throw new IllegalArgumentException("Taxa inválida! A taxa máxima é " + upperLimit + "% a.a.");
 
-            if (rate < 0){
-                System.out.print("Taxa inválida! Digite uma taxa positiva.\n");
-                this.valid = false;
-            }
-
-            else if (rate > 100){
-                System.out.print("Não é permitido taxas maiores que 100% a.a.!\n");
-                this.valid = false;
-            }
-
-        } while (valid);
-
-        //  Convert to decimal
+        // Convert to decimal
         return rate / 100;
     }
 
-    public int getUserMortgageLoanTerm(){
-        int term;
+    public int getUserMortgageLoanTerm(double lowerLimit, double upperLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite o prazo de financiamento (anos): ");
+        int term = this.scan.nextInt();
 
-        do {
-            this.valid = true;
+        if (validateLowerLimitOverInputValue(term, lowerLimit))
+            throw new IllegalArgumentException("Prazo inválido! O prazo mínimo é " + (int)lowerLimit + " anos.");
 
-            System.out.print("\nDigite o prazo de financiamento (anos):");
-            term = this.scan.nextInt();
-
-            if (term < 0){
-                System.out.print("Prazo inválido! Digite um prazo positivo.\n");
-                this.valid = false;
-            }
-
-            else if (term > 50){
-                System.out.print("Não é permitido prazos maiores que 50 anos!\n");
-                this.valid = false;
-            }
-
-        } while (!this.valid);
+        else if (validateInputValueOverUpperLimit(term, upperLimit))
+            throw new IllegalArgumentException("Prazo inválido! O prazo máximo é " + (int)upperLimit + " anos.");
 
         return term;
     }
 
-    public double getUserHouseBuiltArea(){
-        double area;
+    public double getUserHouseDiscountRate(double lowerLimit, double upperLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite a taxa de desconto (anual): ");
+        double rate = this.scan.nextDouble();
 
-        do {
-            this.valid = true;
+        if (validateLowerLimitOverInputValue(rate, lowerLimit))
+            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.");
 
-            System.out.print("\nDigite a área construida:");
-            area = this.scan.nextDouble();
+        else if (validateInputValueOverUpperLimit(rate, upperLimit))
+            throw new IllegalArgumentException("Taxa inválida! O desconto não pode ser maior que o juros (" + upperLimit + "% a.a.)");
 
-            if (area < 10){
-                System.out.print("Área inválida! Digite uma acima de 10m².\n");
-                this.valid = false;
-            }
+        // Convert to decimal
+        return rate / 100;
+    }
 
-        } while (!this.valid);
+    public double getUserHouseBuiltArea(double lowerLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite a área construida: ");
+        double area = this.scan.nextDouble();
+
+        if (validateLowerLimitOverInputValue(area, lowerLimit))
+            throw new IllegalArgumentException("Área inválida! Digite uma área acima de " + lowerLimit + "m².");
 
         return area;
     }
 
-    public double getUserHouseLandArea(){
-        double area;
+    public double getUserHouseLandArea(double lowerLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite a área do terreno: ");
+        double area = this.scan.nextDouble();
 
-        do {
-            this.valid = true;
-
-            System.out.print("\nDigite a área do terreno:");
-            area = this.scan.nextDouble();
-
-            if (area < 20){
-                System.out.print("Área inválida! Digite uma área acima de 20m².\n");
-                this.valid = false;
-            }
-
-        } while (!this.valid);
+        if (validateLowerLimitOverInputValue(area, lowerLimit))
+            throw new IllegalArgumentException("Área inválida! A área do terreno precisa ser maior da área construida (" + lowerLimit + "m²)");
 
         return area;
     }
 
-    public int getUserApartmentParkingSpace(){
-        int spaces;
+    public int getUserApartmentParkingSpace(double lowerLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite a quantidade de vagas de garagem: ");
+        int spaces = this.scan.nextInt();
 
-        do {
-            this.valid = true;
-
-            System.out.print("\nDigite a quantidade de vagas de garagem:");
-            spaces = this.scan.nextInt();
-
-            if (spaces < 0){
-                System.out.print("Valor inválido! O número de vagas não pode ser negativo.\n");
-                this.valid = false;
-            }
-
-        } while (!this.valid);
+        if (validateLowerLimitOverInputValue(spaces, lowerLimit))
+            throw new IllegalArgumentException("Valor inválido! O número de vagas mínimo é " + lowerLimit + " vagas");
 
         return spaces;
     }
 
-    public int getUserApartmentFloor(){
-        int floor;
+    public int getUserApartmentFloor(double lowerLimit, double upperLimit) throws IllegalArgumentException {
+        System.out.print("\nDigite o andar do apartamento: ");
+        int floor = this.scan.nextInt();
 
-        do {
-            this.valid = true;
+        if (validateLowerLimitOverInputValue(floor, lowerLimit))
+            throw new IllegalArgumentException("Andar inválido! O andar mínimo é " + lowerLimit + "°.");
 
-            System.out.print("\nDigite o andar do apartamento:");
-            floor = this.scan.nextInt();
-
-            if (floor < 0){
-                System.out.print("Andar inválido! Digite andar acima de 0.\n");
-                this.valid = false;
-            }
-
-            else if (floor > 100){
-                System.out.print("Não é permitido prédios com mais de 100 andares!\n");
-                this.valid = false;
-            }
-
-        } while (!this.valid);
+        else if (validateInputValueOverUpperLimit(floor, upperLimit))
+            throw new IllegalArgumentException("Andar inválido! O andar máximo é " + upperLimit + "°.");
 
         return floor;
     }
 
-    public String getUserLandZoning(){
-        String zone;
+    public String getUserLandZoning() throws IllegalArgumentException {
+        System.out.println("\nDigite a zona do terreno:");
+        System.out.println("1 - Residencial");
+        System.out.println("2 - Comercial");
+        System.out.println("3 - Industrial");
 
-        do {
-            this.valid = true;
-
-            System.out.println("\nDigite a zona do terreno:");
-            System.out.println("1 - Residencial");
-            System.out.println("2 - Comercial");
-            System.out.println("3 - Industrial");
-
-            zone = this.scan.next();
-
-            switch (zone) {
-                case "1", "Residencial", "residencial" -> {
-                    zone = "Residencial";
-                    this.valid = true;
-                }
-
-                case "2", "Comercial", "comercial" -> {
-                    zone = "Comercial";
-                    this.valid = true;
-                }
-
-                case "3", "Industrial", "industrial" -> {
-                    zone = "Industrial";
-                    this.valid = true;
-                }
-
-                default -> {
-                    System.out.print("Zona inválida! Digite uma zona válida.\n");
-                    this.valid = false;
-                }
-            }
-
-        } while (!this.valid);
-
-        return zone;
+        return switch (this.scan.next()) {
+            case "1", "Residencial", "residencial" -> "Residencial";
+            case "2", "Comercial", "comercial" -> "Comercial";
+            case "3", "Industrial", "industrial" -> "Industrial";
+            default -> throw new IllegalArgumentException("Zona inválida! Digite uma zona válida.");
+        };
     }
 
-    public String getMortgageType(){
-        String type;
+    public String getMortgageType() throws IllegalArgumentException {
+        System.out.println("Selecione o tipo de financiamento:");
+        System.out.println("1 - Casa");
+        System.out.println("2 - Apartamento:");
+        System.out.println("3 - Terreno:");
 
-        do {
-            this.valid = true;
-
-            System.out.println("Selecione o tipo de financiamento:");
-            System.out.println("1 - Casa");
-            System.out.println("2 - Apartamento:");
-            System.out.println("3 - Terreno:");
-
-            type = this.scan.next();
-
-            switch (type) {
-                case "1", "Casa", "casa" -> {
-                    type = "Casa";
-                    this.valid = true;
-                }
-
-                case "2", "Apartamento", "apartamento" -> {
-                    type = "Apartamento";
-                    this.valid = true;
-                }
-
-                case "3", "Terreno", "terreno" -> {
-                    type = "Terreno";
-                    this.valid = true;
-                }
-
-                default -> {
-                    System.out.print("Financiamento inválida! Digite um Financiamento válido.\n");
-                    this.valid = false;
-                }
-            }
-
-        } while (!this.valid);
-
-        return type;
+        return switch (this.scan.next()) {
+            case "1", "Casa", "casa" -> "Casa";
+            case "2", "Apartamento", "apartamento" -> "Apartamento";
+            case "3", "Terreno", "terreno" -> "Terreno";
+            default -> throw new IllegalArgumentException("Tipo de financiamento inválido!");
+        };
     }
 
+    private boolean validateLowerLimitOverInputValue(double value, double lowerLimit) {
+        return lowerLimit > value;
+    }
 
+    private boolean validateInputValueOverUpperLimit(double value, double upperLimit) {
+        return value > upperLimit;
+    }
+
+    private void setDefaultValues(){
+        this.value = -1;
+        this.rate = -1;
+        this.discountRate = -1;
+        this.term = -1;
+        this.builtArea = -1;
+        this.landArea = -1;
+        this.parkingSpace = -1;
+        this.floor = -1;
+        this.zoning = null;
+    }
 }
