@@ -4,16 +4,22 @@
 package main;
 
 import model.Mortgage;
+
 import util.UserInterface;
 import java.util.ArrayList;
+
+//TODO - Formatar texto das mensagens
+//TODO - Adicionar opção de no menu -> Visualizar resultados
+//TODO - Adicionar opção no menu -> Cadastrar dados aleatórios
 
 public class Main {
 
     private final static int mortgageSimulations = 1;
-    private static UserInterface user = new UserInterface();
-    private static ArrayList<Mortgage> mortgages = new ArrayList<Mortgage>();
+    private static final UserInterface user = new UserInterface();
+    private static final ArrayList<Mortgage> mortgages = new ArrayList<>();
 
     public static void main(String[] args) {
+
         System.out.println("CADASTRO FINANCIAMENTOS");
         System.out.print("##############################");
         System.out.print("\n\n");

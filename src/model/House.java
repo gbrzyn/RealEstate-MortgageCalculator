@@ -2,8 +2,8 @@ package model;
 
 public class House extends Mortgage{
 
-    private double builtArea;
-    private double landArea;
+    private final double builtArea;
+    private final double landArea;
 
     public House(double value, double rate, int term, double builtArea, double landArea){
         super(value, rate, term);
@@ -11,19 +11,15 @@ public class House extends Mortgage{
         this.landArea = landArea;
     }
 
+    public double getBuiltArea(){ return this.builtArea; }
+
+    public double getLandArea(){ return this.landArea; }
+
     @Override
     //  Insurance:
     //      Monthly Payment += $80
     public double getMonthlyPayment(){
         return super.getMonthlyPayment() + 80;
-    }
-
-    public double getBuiltArea(){
-        return this.builtArea;
-    }
-
-    public double getLandArea(){
-        return this.landArea;
     }
 
     public void printMortgageInfo(){
