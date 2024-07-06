@@ -25,28 +25,32 @@ public class Main {
         System.out.print("\n\n");
 
         for (var i = 0; i < mortgageSimulations; i++) {
-            String type = user.getMortgageType();
+            try{
+                String type = user.getMortgageType();
 
-            System.out.printf("Financiamento de %s\n", type);
-            System.out.println("==============================");
+                System.out.printf("Financiamento de %s\n", type);
+                System.out.println("==============================");
 
-            switch (type) {
-                case "Casa":
-                    mortgages.add(user.getUserNewHouse());
-                    break;
+                switch (type) {
+                    case "Casa":
+                        mortgages.add(user.getUserNewHouse());
+                        break;
 
-                case "Apartamento":
-                    mortgages.add(user.getUserNewApartment());
-                    break;
+                    case "Apartamento":
+                        mortgages.add(user.getUserNewApartment());
+                        break;
 
-                case "Terreno":
-                    mortgages.add(user.getUserNewLand());
-                    break;
+                    case "Terreno":
+                        mortgages.add(user.getUserNewLand());
+                        break;
 
-                default:
-                    System.out.println("Opção inválida! Tente novamente.");
-                    i--;
-                    break;
+                    default:
+                        throw new Exception("Tipo de financiamento inválido!");
+                }
+
+            } catch (Exception e){
+                System.out.println(e.getMessage());
+                i--;
             }
         }
 
