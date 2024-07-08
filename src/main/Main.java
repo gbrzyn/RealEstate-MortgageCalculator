@@ -5,21 +5,25 @@ package main;
 
 import model.Mortgage;
 
+import util.FileInterface;
 import util.UserInterface;
 import java.util.ArrayList;
 
 //TODO - Formatar texto das mensagens
-//TODO - Adicionar opção de no menu -> Visualizar resultados
 //TODO - Adicionar opção no menu -> Cadastrar dados aleatórios
 
 public class Main {
 
+    private static final String dbFileName = "financiamentos.dat";
+    private static final String receiptFileName = "recibo.txt";
 
     public static void main(String[] args) {
         var mortgages = getMortgages();
 
         if(mortgages != null) {
             var result = getResult(mortgages);
+
+            FileInterface.updateReceipt(result, receiptFileName);
             System.out.println(result);
         }
 
@@ -36,22 +40,57 @@ public class Main {
             boolean exit = false;
 
             try{
-                String type = user.getMortgageType();
-
-                System.out.printf("Financiamento de %s\n", type);
-                System.out.println("==============================");
+                String type = user.getUserAction();
 
                 switch (type) {
-                    case "Casa":
-                        mortgages.add(user.getUserNewHouse());
+                    case "randomCasa", "casa":
+                        mortgages.add(user.getUserNewHouse(type.equals("randomCasa")));
                         break;
 
-                    case "Apartamento":
-                        mortgages.add(user.getUserNewApartment());
+                    case "randomApartamento", "apartamento":
+                        mortgages.add(user.getUserNewApartment(type.equals("randomApartamento")));
                         break;
 
-                    case "Terreno":
-                        mortgages.add(user.getUserNewLand());
+                    case "randomTerreno", "terreno":
+                        mortgages.add(user.getUserNewLand(type.equals("randomTerreno")));
+                        break;
+
+                    case "resultado":
+                        while (true) {
+                            try{
+                                var fileName = user.getResultType();
+
+                                if (fileName.equals("cadastrados") && !mortgages.isEmpty())
+                                    updateDataBase(mortgages);
+
+                                else {
+                                    if(!mortgages.isEmpty() && user.getUserSaveOption()){
+                                        updateDataBase(mortgages);
+                                        System.out.println("Financiamentos salvos com sucesso!");
+                                    }
+
+                                    else if (fileName.isEmpty() || fileName.isBlank() || fileName.endsWith(".txt")) {
+                                        mortgages.clear();
+                                        mortgages.addAll(FileInterface.getManyMortgage(dbFileName));
+
+                                        FileInterface.updateReceipt(getResult(mortgages), receiptFileName);
+                                        System.out.println(FileInterface.getReceipt(fileName));
+
+                                        return null;
+                                    }
+
+                                    else if (fileName.endsWith(".dat")) {
+                                        mortgages.clear();
+                                        mortgages.addAll(FileInterface.getManyMortgage(fileName));
+                                    }
+                                }
+                                break;
+
+                            } catch (Exception e){
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                        exit = true;
                         break;
 
                     case "sair":
@@ -100,7 +139,8 @@ public class Main {
         return str.toString();
     }
 
-    private static float getRandomNumber() {
-        return (float) ((int)(Math.random() * 1000) + 1) / 1000;
+    private static void updateDataBase(ArrayList<Mortgage> mortgages){
+        mortgages.addAll(0, FileInterface.getManyMortgage(dbFileName));
+        FileInterface.updateManyMortgage(mortgages, dbFileName);
     }
 }

@@ -1,8 +1,8 @@
 package model;
 
-//TODO - Formatar texto das mensagens
+import java.io.Serializable;
 
-public abstract class Mortgage {
+public abstract class Mortgage implements Serializable {
 
     private final double realEstateValue;
     private final double annualPercentageRate;
