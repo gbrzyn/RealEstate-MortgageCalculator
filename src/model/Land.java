@@ -18,10 +18,9 @@ public class Land extends Mortgage{
         return super.getMonthlyPayment() * 1.02;
     }
 
-    public void printMortgageInfo(){
-        System.out.println("Tipo: TERRENO");
-        System.out.printf("Zona: %s \n", this.getZoning());
-
-        super.printPaymentInfo();
+    public String getMortgageInfo(){
+        return "Tipo: TERRENO\n" +
+                String.format("Zona: %s\n", this.getZoning()) +
+                super.getPaymentInfo();
     }
 }

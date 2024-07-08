@@ -5,76 +5,160 @@ package main;
 
 import model.Mortgage;
 
+import util.FileInterface;
 import util.UserInterface;
 import java.util.ArrayList;
 
-//TODO - Formatar texto das mensagens
-//TODO - Adicionar opção de no menu -> Visualizar resultados
-//TODO - Adicionar opção no menu -> Cadastrar dados aleatórios
-
 public class Main {
 
-    private final static int mortgageSimulations = 1;
-    private static final UserInterface user = new UserInterface();
-    private static final ArrayList<Mortgage> mortgages = new ArrayList<>();
+    private static final String dbFileName = "financiamentos.dat";
+    private static final String receiptFileName = "recibo.txt";
 
     public static void main(String[] args) {
+        UserInterface user = new UserInterface();
+        FileInterface fileInterface = new FileInterface(dbFileName);
+        fileInterface.openDataBase();
 
-        System.out.println("CADASTRO FINANCIAMENTOS");
-        System.out.print("##############################");
-        System.out.print("\n\n");
+        ArrayList<Mortgage> mortgages = new ArrayList<>();
+        String result = "";
 
-        for (var i = 0; i < mortgageSimulations; i++) {
-            try{
-                String type = user.getMortgageType();
+        // Main loop
+        boolean exit = false;
+        while (!exit) {
+            try {
+                exit = switch (user.getUserAction()) {
+                    case "manual" -> {
+                        getMortgages(user, mortgages, false);
+                        yield false;
+                    }
 
-                System.out.printf("Financiamento de %s\n", type);
-                System.out.println("==============================");
+                    case "automatico" -> {
+                        getMortgages(user, mortgages, true);
+                        yield false;
+                    }
 
-                switch (type) {
-                    case "Casa":
-                        mortgages.add(user.getUserNewHouse());
-                        break;
+                    case "resultado" -> {
+                        while (true) {
+                            try {
+                                var action = user.getUserResultType();
 
-                    case "Apartamento":
-                        mortgages.add(user.getUserNewApartment());
-                        break;
+                                if (!mortgages.isEmpty() && user.getUserSaveOption()) {
+                                    mortgages.addAll(fileInterface.getManyMortgage());
+                                    fileInterface.updateManyMortgage(mortgages);
 
-                    case "Terreno":
-                        mortgages.add(user.getUserNewLand());
-                        break;
+                                    System.out.println("\nSalvando financiamentos...");
+                                    System.out.println("Financiamentos salvos com sucesso!\n");
+                                }
 
-                    default:
-                        throw new Exception("Tipo de financiamento inválido!");
-                }
+                                if (action.equals("cadastrados"))
+                                    result = getResult(mortgages);
 
-            } catch (Exception e){
+                                else if (action.isEmpty() || action.isBlank())
+                                        result = getResult(fileInterface.getManyMortgage());
+
+                                else if (action.endsWith(".txt"))
+                                    result = fileInterface.getReceipt(action);
+
+
+                                break;
+
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                        yield true;
+                    }
+
+                    case "sair" -> {
+                        if (!mortgages.isEmpty() && user.getUserSaveOption()) {
+                            mortgages.addAll(fileInterface.getManyMortgage());
+                            fileInterface.updateManyMortgage(mortgages);
+
+                            System.out.println("\nSalvando financiamentos...");
+                            System.out.println("Financiamentos salvos com sucesso!\n");
+                        }
+                        yield true;
+                    }
+
+                    default -> throw new IllegalStateException("Unexpected value -> " + user.getUserAction() + "\n");
+                };
+
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
-                i--;
             }
         }
 
+        // Print result
+        System.out.println(result);
+
+        // Generate receipt
+        if (!mortgages.isEmpty() && !result.isEmpty() && user.getUserReceiptOption()) {
+            while (true) {
+                try {
+                    System.out.println("Arquivo de recibo .txt (ou deixe em branco para sobrescrever)");
+                    var fileName = user.getUserFileName();
+
+                    if (fileName.isEmpty() || fileName.isBlank())
+                        fileInterface.updateReceipt(receiptFileName, result);
+                    else
+                        fileInterface.updateReceipt(fileName, result);
+
+                    System.out.println("\nGerando recibo...");
+                    System.out.println("Recibo gerado com sucesso!\n");
+
+                    break;
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
         user.closeScanner();
 
-        System.out.print("\n\n\n");
-        System.out.println("RESULTADO FINANCIAMENTOS");
-        System.out.print("##############################");
-
-        for (var i = 0; i < mortgages.size(); i++) {
-            System.out.print("\n\n");
-            System.out.printf("Financiamento #%d:\n", i + 1);
-            System.out.print("==============================");
-            System.out.print("\n");
-
-            Mortgage mortgage = mortgages.get(i);
-            mortgage.updateTotalMortgageValues();
-            mortgage.printMortgageInfo();
-        }
-
-        Mortgage.printTotalMortgageValues(mortgages.size());
+        System.out.println("Finalizando Programa...");
     }
 
-    private static float getRandomNumber() {
-        return (float) ((int)(Math.random() * 1000) + 1) / 1000;
+
+    private static void getMortgages(UserInterface user, ArrayList<Mortgage> mortgages, boolean random) {
+        System.out.println("\nCADASTRO FINANCIAMENTOS");
+        System.out.print("##############################\n");
+
+        while(true) {
+            try{
+                switch (user.getUserMortgageType()) {
+                    case "casa" -> mortgages.add(user.getUserNewHouse(random));
+                    case "apartamento" -> mortgages.add(user.getUserNewApartment(random));
+                    case "terreno" -> mortgages.add(user.getUserNewLand(random));
+                } break;
+
+            } catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static String getResult(ArrayList<Mortgage> mortgages) {
+        StringBuilder str = new StringBuilder();
+
+        if(mortgages.isEmpty()) {
+            str.append("\nNenhum financiamento cadastrado!\n");
+            return str.toString();
+        }
+
+        str.append("\n\nRESULTADO FINANCIAMENTOS\n")
+                .append("##############################\n");
+
+        for (var i = 0; i < mortgages.size(); i++) {
+            Mortgage mortgage = mortgages.get(i);
+            mortgage.updateTotalMortgageValues();
+
+            str.append(String.format("\nFinanciamento #%d:\n", i + 1))
+                    .append("==============================\n")
+                    .append(mortgage.getMortgageInfo())
+                    .append("==============================\n\n");
+        }
+        str.append(Mortgage.getTotalMortgageValues(mortgages.size()));
+
+        return str.toString();
     }
 }
