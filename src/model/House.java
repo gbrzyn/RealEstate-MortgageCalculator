@@ -29,12 +29,11 @@ public class House extends Mortgage{
         return super.getMonthlyPayment() + 80;
     }
 
-    public void printMortgageInfo(){
-        System.out.println("Tipo: CASA");
-        System.out.printf("Área Construída: %.2f m²\n", this.getBuiltArea());
-        System.out.printf("Área do Terreno: %.2f m²\n", this.getLandArea());
-        System.out.printf("Desconto: %.2f%% a.a.\n", this.getDiscountRate() * 100);
-
-        super.printPaymentInfo();
+    public String getMortgageInfo(){
+        return "Tipo: CASA\n" +
+                String.format("Área Construída: %.2f m²\n", this.getBuiltArea()) +
+                String.format("Área do Terreno: %.2f m²\n", this.getLandArea()) +
+                String.format("Desconto: %.2f%% a.a.\n", this.getDiscountRate() * 100) +
+                super.getPaymentInfo();
     }
 }

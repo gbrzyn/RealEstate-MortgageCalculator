@@ -14,17 +14,27 @@ import java.util.ArrayList;
 
 public class Main {
 
-    private final static int mortgageSimulations = 1;
-    private static final UserInterface user = new UserInterface();
-    private static final ArrayList<Mortgage> mortgages = new ArrayList<>();
 
     public static void main(String[] args) {
+        var mortgages = getMortgages();
+
+        if(mortgages != null) {
+            var result = getResult(mortgages);
+            System.out.println(result);
+        }
+
+    }
+
+    private static ArrayList<Mortgage> getMortgages() {
+        UserInterface user = new UserInterface();
+        ArrayList<Mortgage> mortgages = new ArrayList<>();
 
         System.out.println("CADASTRO FINANCIAMENTOS");
-        System.out.print("##############################");
-        System.out.print("\n\n");
+        System.out.print("##############################\n");
 
-        for (var i = 0; i < mortgageSimulations; i++) {
+        while(true) {
+            boolean exit = false;
+
             try{
                 String type = user.getMortgageType();
 
@@ -44,34 +54,50 @@ public class Main {
                         mortgages.add(user.getUserNewLand());
                         break;
 
+                    case "sair":
+                        if(!mortgages.isEmpty() && user.getUserSaveOption()) {
+                            updateDataBase(mortgages);
+                            System.out.println("Financiamentos salvos com sucesso!");
+                        }
+                        return null;
+
                     default:
                         throw new Exception("Tipo de financiamento inválido!");
                 }
 
             } catch (Exception e){
                 System.out.println(e.getMessage());
-                i--;
             }
-        }
 
+            if(exit) break;
+        }
         user.closeScanner();
 
-        System.out.print("\n\n\n");
-        System.out.println("RESULTADO FINANCIAMENTOS");
-        System.out.print("##############################");
+        return mortgages;
+    }
 
-        for (var i = 0; i < mortgages.size(); i++) {
-            System.out.print("\n\n");
-            System.out.printf("Financiamento #%d:\n", i + 1);
-            System.out.print("==============================");
-            System.out.print("\n");
+    private static String getResult(ArrayList<Mortgage> mortgages) {
+        StringBuilder str = new StringBuilder();
 
-            Mortgage mortgage = mortgages.get(i);
-            mortgage.updateTotalMortgageValues();
-            mortgage.printMortgageInfo();
+        if(mortgages.isEmpty()) {
+            str.append("Nenhum financiamento cadastrado!");
+            return str.toString();
         }
 
-        Mortgage.printTotalMortgageValues(mortgages.size());
+        str.append("\n\n\nRESULTADO FINANCIAMENTOS\n")
+                .append("##############################");
+
+        for (var i = 0; i < mortgages.size(); i++) {
+            Mortgage mortgage = mortgages.get(i);
+            mortgage.updateTotalMortgageValues();
+
+            str.append(String.format("\n\nFinanciamento #%d:\n", i + 1))
+                    .append("==============================\n")
+                    .append(mortgage.getMortgageInfo());
+        }
+        str.append(Mortgage.getTotalMortgageValues(mortgages.size()));
+
+        return str.toString();
     }
 
     private static float getRandomNumber() {

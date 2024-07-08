@@ -31,11 +31,11 @@ public class Apartment extends Mortgage{
         return getRealEstateValue() * (Math.pow((1 + rate), period) * rate) / (Math.pow((1 + rate), period) - 1);
     }
 
-    public void printMortgageInfo(){
-        System.out.println("Tipo: APARTAMENTO");
-        System.out.printf("Garagem: %d vagas\n", this.getParkingSpaces());
-        System.out.printf("Andar: %d°\n", this.getFloor());
+    public String getMortgageInfo(){
 
-        super.printPaymentInfo();
+        return "Tipo: APARTAMENTO\n" +
+                String.format("Garagem: %d vagas\n", this.getParkingSpaces()) +
+                String.format("Andar: %d°\n", this.getFloor()) +
+                super.getPaymentInfo();
     }
 }
