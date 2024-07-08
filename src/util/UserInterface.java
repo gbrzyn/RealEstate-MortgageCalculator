@@ -4,10 +4,11 @@ import model.Apartment;
 import model.House;
 import model.Land;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UserInterface {
-    private Scanner scan;
+    private final Scanner scan;
     private String zoning;
 
     private double value;
@@ -23,116 +24,153 @@ public class UserInterface {
     public UserInterface(){ this.scan = new Scanner(System.in); }
 
     public void closeScanner(){
-        if(this.scan != null)
-            this.scan.close();
+        this.scan.close();
     }
 
-    public House getUserNewHouse(boolean simulation){
+    public House getUserNewHouse(boolean random){
         this.setDefaultValues();
 
         String str = "\nFinanciamento de " +
-                (simulation ? "Casa (Simulação)" : "Casa") +
+                (random ? "Casa (Simulação)" : "Casa") +
                 "\n==============================";
         System.out.println(str);
 
         while(true){
             try {
                 if(value == -1)
-                    value = simulation ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
+                    value = random ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
 
                 if(rate == -1)
-                    rate = simulation ? getRandomNumber(1, 100) : this.getUserMortgageAnnualPercentageRate(1, 100);
+                    rate = random ? getRandomNumber(1, 1000) / 1000 : this.getUserMortgageAnnualPercentageRate(1, 100); //To decimal
 
                 if(discountRate == -1)
-                    discountRate = simulation ? getRandomNumber(0, rate) : this.getUserHouseDiscountRate(0, rate * 100);
+                    discountRate = random ? getRandomNumber(0, rate * 1000) / 1000 : this.getUserHouseDiscountRate(0, rate * 100); //To decimal
 
                 if(term == -1)
-                    term = simulation ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
+                    term = random ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
 
                 if(builtArea == -1)
-                    builtArea = simulation ? (int)getRandomNumber(15, -1) : this.getUserHouseBuiltArea(15);
+                    builtArea = random ? (int)getRandomNumber(15, -1) : this.getUserHouseBuiltArea(15);
 
                 if(landArea == -1)
-                    landArea = simulation ? (int)getRandomNumber(builtArea, -1) : this.getUserHouseLandArea(builtArea);
+                    landArea = random ? (int)getRandomNumber(builtArea, -1) : this.getUserHouseLandArea(builtArea);
+
+                if (random){
+                    str = "Valor do ativo: R$" + value +
+                    "\nTaxa de juros (anual): " + (int)(rate * 1000) / 10 + "%" + //To percentage
+                    "\nTaxa de desconto (anual): " + (int)(discountRate * 1000) / 10 + "%" + //To percentage
+                    "\nPrazo de financiamento (anos): " + term +
+                    "\nÁrea construida: " + builtArea + " m²" +
+                    "\nÁrea do terreno: " + landArea + " m²\n";
+
+                    System.out.println(str);
+                }
 
                 return new House(value, rate, discountRate, term, builtArea, landArea);
 
             } catch (IllegalArgumentException | DiscountRateException e){
                 System.out.println(e.getMessage());
+            }catch (InputMismatchException e){
+                System.out.println("Valor inválido!\n");
+                this.scan.nextLine();
             }
         }
     }
 
-    public Apartment getUserNewApartment(boolean simulation){
+    public Apartment getUserNewApartment(boolean random){
         this.setDefaultValues();
 
         String str = "\nFinanciamento de " +
-                (simulation ? "Apartamento (Simulação)" : "Apartamento") +
+                (random ? "Apartamento (Simulação)" : "Apartamento") +
                 "\n==============================";
         System.out.println(str);
 
         while(true){
             try {
                 if(value == -1)
-                    value = simulation ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
+                    value = random ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
 
                 if(rate == -1)
-                    rate = simulation ? getRandomNumber(1, 100) : this.getUserMortgageAnnualPercentageRate(1, 100);
+                    rate = random ? getRandomNumber(1, 1000) / 1000 : this.getUserMortgageAnnualPercentageRate(1, 100);
 
                 if(term == -1)
-                    term = simulation ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
+                    term = random ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
 
                 if(parkingSpace == -1)
-                    parkingSpace = simulation ? (int)getRandomNumber(1, -1) : this.getUserApartmentParkingSpace(1);
+                    parkingSpace = random ? (int)getRandomNumber(1, 20) : this.getUserApartmentParkingSpace(1);
 
                 if(floor == -1)
-                    floor = simulation ? (int)getRandomNumber(0, 100) : this.getUserApartmentFloor(0, 100);
+                    floor = random ? (int)getRandomNumber(0, 100) : this.getUserApartmentFloor(0, 100);
+
+                if (random){
+                    str = "\nValor do ativo: R$" + value +
+                    "\nTaxa de juros (anual): " + (int)(rate * 1000) / 10 + "%" + //To percentage
+                    "\nPrazo de financiamento (anos): " + term +
+                    "\nVagas de garagem: " + parkingSpace +
+                    "\nAndar do apartamento: " + floor + "°\n";
+
+                    System.out.println(str);
+                }
 
                 return new Apartment(value, rate, term, parkingSpace, floor);
 
             } catch (IllegalArgumentException e){
                 System.out.println(e.getMessage());
+            } catch (InputMismatchException e){
+                System.out.println("Valor inválido!\n");
+                this.scan.nextLine();
             }
         }
     }
 
-    public Land getUserNewLand(boolean simulation){
+    public Land getUserNewLand(boolean random){
         this.setDefaultValues();
 
         String str = "\nFinanciamento de " +
-                (simulation ? "Terreno (Simulação)" : "Terreno") +
+                (random ? "Terreno (Simulação)" : "Terreno") +
                 "\n==============================";
         System.out.println(str);
 
         while(true){
             try {
                 if(value == -1)
-                    value = simulation ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
+                    value = random ? getRandomNumber(1, -1) * 1000 : this.getUserMortgageRealEstateValue(1000);
 
                 if(rate == -1)
-                    rate = simulation ? getRandomNumber(1, 100) : this.getUserMortgageAnnualPercentageRate(1, 100);
+                    rate = random ? getRandomNumber(1, 1000) / 1000 : this.getUserMortgageAnnualPercentageRate(1, 100);
 
                 if(term == -1)
-                    term = simulation ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
+                    term = random ? (int)getRandomNumber(1, 50) : this.getUserMortgageLoanTerm(1, 50);
 
                 if(zoning == null){
-                    if(simulation){
-                        int random = (int)getRandomNumber(100, 300) / 100;
-                        zoning = switch (random) {
+                    if(random){
+                        zoning = switch ((int)getRandomNumber(100, 300) / 100) {
                             case 1 -> "Residencial";
                             case 2 -> "Comercial";
                             case 3 -> "Industrial";
-                            default -> throw new IllegalArgumentException("Erro do Sistema! Zona inválida.");
+                            default -> throw new IllegalArgumentException("Erro do Sistema! Zona inválida.\n");
                         };
                     }
                     else
                         zoning = this.getUserLandZoning();
                 }
 
+                if (random){
+                    str = "\nValor do ativo: R$" + value +
+                    "\nTaxa de juros (anual): " + (int)(rate * 1000) / 10 + "%" + //To percentage
+                    "\nPrazo de financiamento (anos): " + term +
+                    "\nZona do terreno: " + zoning + "\n";
+
+                    System.out.println(str);
+                }
+
                 return new Land(value, rate, term, zoning);
 
             } catch (IllegalArgumentException e){
                 System.out.println(e.getMessage());
+            } catch (InputMismatchException e){
+                System.out.println("Valor inválido!\n");
+                this.scan.nextLine();
             }
         }
     }
@@ -142,7 +180,7 @@ public class UserInterface {
         double value = this.scan.nextDouble();
 
         if (validateLowerLimitOverInputValue(value, lowerLimit))
-            throw new IllegalArgumentException("Valor inválido! O valor mínimo do ativo é R$" + lowerLimit + "0.");
+            throw new IllegalArgumentException("Valor inválido! O valor mínimo do ativo é R$" + lowerLimit + "0.\n");
 
         return value;
     }
@@ -152,10 +190,10 @@ public class UserInterface {
         double rate = this.scan.nextDouble();
 
         if (validateLowerLimitOverInputValue(rate, lowerLimit))
-            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.");
+            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.\n");
 
         else if (validateInputValueOverUpperLimit(rate, upperLimit))
-            throw new IllegalArgumentException("Taxa inválida! A taxa máxima é " + upperLimit + "% a.a.");
+            throw new IllegalArgumentException("Taxa inválida! A taxa máxima é " + upperLimit + "% a.a.\n");
 
         // Convert to decimal
         return rate / 100;
@@ -166,10 +204,10 @@ public class UserInterface {
         int term = this.scan.nextInt();
 
         if (validateLowerLimitOverInputValue(term, lowerLimit))
-            throw new IllegalArgumentException("Prazo inválido! O prazo mínimo é " + (int)lowerLimit + " anos.");
+            throw new IllegalArgumentException("Prazo inválido! O prazo mínimo é " + (int)lowerLimit + " anos.\n");
 
         else if (validateInputValueOverUpperLimit(term, upperLimit))
-            throw new IllegalArgumentException("Prazo inválido! O prazo máximo é " + (int)upperLimit + " anos.");
+            throw new IllegalArgumentException("Prazo inválido! O prazo máximo é " + (int)upperLimit + " anos.\n");
 
         return term;
     }
@@ -179,10 +217,10 @@ public class UserInterface {
         double rate = this.scan.nextDouble();
 
         if (validateLowerLimitOverInputValue(rate, lowerLimit))
-            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.");
+            throw new IllegalArgumentException("Taxa inválida! A taxa mínima é " + lowerLimit + "% a.a.\n");
 
         else if (validateInputValueOverUpperLimit(rate, upperLimit))
-            throw new IllegalArgumentException("Taxa inválida! O desconto não pode ser maior que o juros (" + upperLimit + "% a.a.)");
+            throw new IllegalArgumentException("Taxa inválida! O desconto não pode ser maior que o juros (" + upperLimit + "% a.a.)\n");
 
         // Convert to decimal
         return rate / 100;
@@ -193,7 +231,7 @@ public class UserInterface {
         double area = this.scan.nextDouble();
 
         if (validateLowerLimitOverInputValue(area, lowerLimit))
-            throw new IllegalArgumentException("Área inválida! Digite uma área acima de " + lowerLimit + "m².");
+            throw new IllegalArgumentException("Área inválida! Digite uma área acima de " + lowerLimit + "m².\n");
 
         return area;
     }
@@ -203,7 +241,7 @@ public class UserInterface {
         double area = this.scan.nextDouble();
 
         if (validateLowerLimitOverInputValue(area, lowerLimit))
-            throw new IllegalArgumentException("Área inválida! A área do terreno precisa ser maior da área construida (" + lowerLimit + "m²)");
+            throw new IllegalArgumentException("Área inválida! A área do terreno precisa ser maior da área construida (" + lowerLimit + "m²)\n");
 
         return area;
     }
@@ -213,7 +251,7 @@ public class UserInterface {
         int spaces = this.scan.nextInt();
 
         if (validateLowerLimitOverInputValue(spaces, lowerLimit))
-            throw new IllegalArgumentException("Valor inválido! O número de vagas mínimo é " + lowerLimit + " vagas");
+            throw new IllegalArgumentException("Valor inválido! O número de vagas mínimo é " + lowerLimit + " vagas\n");
 
         return spaces;
     }
@@ -223,10 +261,10 @@ public class UserInterface {
         int floor = this.scan.nextInt();
 
         if (validateLowerLimitOverInputValue(floor, lowerLimit))
-            throw new IllegalArgumentException("Andar inválido! O andar mínimo é " + lowerLimit + "°.");
+            throw new IllegalArgumentException("Andar inválido! O andar mínimo é " + lowerLimit + "°.\n");
 
         else if (validateInputValueOverUpperLimit(floor, upperLimit))
-            throw new IllegalArgumentException("Andar inválido! O andar máximo é " + upperLimit + "°.");
+            throw new IllegalArgumentException("Andar inválido! O andar máximo é " + upperLimit + "°.\n");
 
         return floor;
     }
@@ -236,81 +274,93 @@ public class UserInterface {
         System.out.println("1 - Residencial");
         System.out.println("2 - Comercial");
         System.out.println("3 - Industrial");
+        System.out.print("\nZona: ");
 
         return switch (this.scan.next()) {
             case "1", "Residencial", "residencial" -> "Residencial";
             case "2", "Comercial", "comercial" -> "Comercial";
             case "3", "Industrial", "industrial" -> "Industrial";
-            default -> throw new IllegalArgumentException("Zona inválida! Digite uma zona válida.");
+            default -> throw new IllegalArgumentException("Zona inválida! Digite uma zona válida.\n");
         };
     }
 
     public String getUserAction() throws IllegalArgumentException {
         System.out.println("\nSelecione a opção:");
-        System.out.println("1 - Cadastro de financiamento");
-        System.out.println("2 - Simulação de financiamento (aleatório)");
-        System.out.println("3 - Resultado de financiamento");
+        System.out.println("1 - Cadastro de financiamento (manual)");
+        System.out.println("2 - Cadastro de financiamento (automatico)");
+        System.out.println("3 - Mostrar resultados");
         System.out.println("4 - Sair");
-        System.out.print("Opção: ");
+        System.out.print("\nOpção: ");
 
         return switch (this.scan.next()) {
-            case "1", "Cadastro", "cadastro" -> getMortgageType(false);
-            case "2", "Simulação", "simulação", "Simulacao", "simulacao" -> getMortgageType(true);
+            case "1", "Manual", "manual" -> "manual";
+            case "2", "Automatico", "automatico", "auto" -> "automatico";
             case "3", "Resultado", "resultado", "Resultados", "resultados" -> "resultado";
             case "4", "Sair", "sair", "esc", "exit" -> "sair";
-            default -> throw new IllegalArgumentException("Opção inválida!");
+            default -> throw new IllegalArgumentException("Opção inválida!\n");
         };
     }
 
-    public String getMortgageType(boolean simulation) throws IllegalArgumentException {
+    public String getUserMortgageType() throws IllegalArgumentException {
         System.out.println("\nSelecione o tipo de financiamento:");
         System.out.println("1 - Casa");
         System.out.println("2 - Apartamento");
         System.out.println("3 - Terreno");
-        System.out.print("Opção: ");
-
-        return switch (this.scan.next()) {
-            case "1", "Casa", "casa" -> simulation ? "randomCasa" : "casa";
-            case "2", "Apartamento", "apartamento" -> simulation ? "randomApartamento" : "apartamento";
-            case "3", "Terreno", "terreno" -> simulation ? "randomTerreno" : "terreno";
-            default -> throw new IllegalArgumentException("Tipo de financiamento inválido!");
-        };
-    }
-
-    public String getResultType() throws IllegalArgumentException {
-        System.out.println("\nOpção de resultado:");
-        System.out.println("1 - Imprimir cadastrados");
-        System.out.println("2 - Imprimir do recibo");
         System.out.print("\nOpção: ");
 
         return switch (this.scan.next()) {
-            case "1", "Cadastrados", "cadastrados", "cadastro"  -> "cadastrados";
-            case "2", "Recibo", "recibo" -> {
-                System.out.print("\nDigite o nome do arquivo do recibo (.txt) ou base de dados (.dat) ");
-                System.out.println("(Deixar vazio para arquivo padrão):\n");
-
-                this.scan.nextLine();
-                String fileName = this.scan.nextLine();
-
-                if(fileName.isEmpty() || fileName.isBlank())
-                    yield fileName;
-
-                if(!fileName.endsWith(".txt") && !fileName.endsWith(".dat"))
-                    throw new IllegalArgumentException("Nome de arquivo inválido! Digite um nome de arquivo válido.");
-
-                yield fileName;
-            }
-            default -> throw new IllegalArgumentException("Tipo de resultado inválido!");
+            case "1", "Casa", "casa" -> "casa";
+            case "2", "Apartamento", "apartamento" -> "apartamento";
+            case "3", "Terreno", "terreno" -> "terreno";
+            default -> throw new IllegalArgumentException("Tipo de financiamento inválido!\n");
         };
     }
 
+    public String getUserResultType() throws IllegalArgumentException {
+        System.out.println("\nSelecione o tipo de resultado:");
+        System.out.println("1 - Imprimir financiamentos cadastrados");
+        System.out.println("2 - Imprimir financiamentos do arquivo");
+        System.out.print("\nOpção: ");
+
+        return switch (this.scan.next().toLowerCase()) {
+            case "1", "cadastrados" -> "cadastrados";
+            case "2", "arquivo" -> {
+                System.out.println("\nAceitos arquivos de recibo (.txt), ou deixar em branco para acessar a base de dados!");
+                yield getUserFileName();
+            }
+            default -> throw new IllegalArgumentException("Opção inválida!\n");
+        };
+    }
+
+    public String getUserFileName() throws IllegalArgumentException {
+        System.out.print("Digite o nome do arquivo: ");
+        if (this.scan.hasNextLine())
+            this.scan.nextLine();
+        var fileName = this.scan.nextLine();
+
+        if ((!fileName.isEmpty() || !fileName.isBlank()) && !fileName.endsWith(".txt"))
+            throw new IllegalArgumentException("Nome do arquivo inválido! O arquivo deve ser .txt\n");
+
+        return fileName;
+    }
+
     public boolean getUserSaveOption() throws IllegalArgumentException {
-        System.out.println("Deseja salvar financiamentos cadastrados? (S/N)");
+        System.out.print("\nVocê possui financiamentos cadastrados, deseja salva-los? (S/N): ");
 
         return switch (this.scan.next()) {
             case "S", "s", "Sim", "sim" -> true;
             case "N", "n", "Não", "não", "nao" -> false;
-            default -> throw new IllegalArgumentException("Opção inválida!");
+            default -> throw new IllegalArgumentException("Opção inválida!\n");
+        };
+    }
+
+    public boolean getUserReceiptOption() throws IllegalArgumentException {
+        System.out.print("\nDeseja gerar recibo? (S/N): ");
+
+        return switch (this.scan.next()) {
+            case "S", "s", "Sim", "sim" -> true;
+            case "N", "n", "Não", "não", "nao" -> false;
+            default -> throw new IllegalArgumentException("Opção inválida!\n");
         };
     }
 
@@ -333,23 +383,26 @@ public class UserInterface {
     // Default values (not defined) = -1
     // Value range = [0, 1000]
     private static double getRandomNumber(double lowerLimit, double upperLimit) {
-        if (upperLimit != -1 && upperLimit > 1000)
-            throw new IllegalArgumentException("Erro do Sistema! Limite superior fora do range.");
-        else if (lowerLimit != -1 && lowerLimit > 1000)
-            throw new IllegalArgumentException("Erro do Sistema! Limite inferior fora do range.");
-        else if (lowerLimit != -1 && upperLimit != -1 && (lowerLimit >= upperLimit))
-            throw new IllegalArgumentException("Erro do Sistema! Limite inferior >= limite superior.");
+        if (upperLimit == -1)
+            upperLimit = 1000;
+        else if (upperLimit > 1000)
+            throw new IllegalArgumentException("Erro do Sistema! Limite superior fora do range.\n");
+
+        if (lowerLimit == -1)
+            lowerLimit = 0;
+        else if (lowerLimit < 0)
+            throw new IllegalArgumentException("Erro do Sistema! Limite inferior fora do range.\n");
+
+        if (lowerLimit >= upperLimit)
+            throw new IllegalArgumentException("Erro do Sistema! Limite inferior >= limite superior.\n");
 
         double value;
-
         while(true) {
             value = (int)(Math.random() * 1000) + 1;
 
-            System.out.println(value);
-
-            if(lowerLimit != -1 && value < lowerLimit)
+            if(value < lowerLimit)
                 continue;
-            else if (upperLimit != -1 && value > upperLimit)
+            else if (value > upperLimit)
                 continue;
 
             return value;

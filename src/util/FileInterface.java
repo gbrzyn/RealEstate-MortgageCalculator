@@ -3,13 +3,31 @@ package util;
 import model.Mortgage;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileInterface {
+    private final File dataBaseFile;
 
-    public static void updateManyMortgage(ArrayList<Mortgage> mortgages, String fileName) throws RuntimeException {
+    public FileInterface(String dataBaseFileName) {
+        dataBaseFile = new File(dataBaseFileName);
+    }
+
+    public void openDataBase() {
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(fileName));
+            if (!getDataBaseFile().createNewFile())
+                Paths.get(dataBaseFile.toURI());
+
+        } catch (IOException e) {
+            System.out.println("Erro ao acessar Data Base! -> " + e.getMessage() + "\n");
+        }
+    }
+
+    public File getDataBaseFile() { return dataBaseFile; }
+
+    public void updateManyMortgage(ArrayList<Mortgage> mortgages) throws RuntimeException {
+        try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(getDataBaseFile()));
 
             for (Mortgage mortgage : mortgages)
                 objectOutputStream.writeObject(mortgage);
@@ -18,35 +36,36 @@ public class FileInterface {
             objectOutputStream.close();
 
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Erro ao acessar Data Base!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao acessar Data Base! -> " + e.getMessage() + "\n");
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao atualizar Data Base!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao atualizar Data Base! -> " + e.getMessage() + "\n");
         }
     }
 
-    public static ArrayList<Mortgage> getManyMortgage(String fileName) throws RuntimeException {
+    public ArrayList<Mortgage> getManyMortgage() throws RuntimeException {
         ArrayList<Mortgage> mortgages = new ArrayList<>();
         Object obj;
 
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(fileName));
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(getDataBaseFile()));
 
             while ((obj = objectInputStream.readObject()) != null){
                 if (obj instanceof Mortgage)
                     mortgages.add((Mortgage)obj);
             }
+            objectInputStream.close();
 
         } catch (EOFException _) {
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Erro ao acessar Data Base!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao acessar Data Base! -> " + e.getMessage() + "\n");
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Erro ao ler Data Base!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao ler Data Base! -> " + e.getMessage() + "\n");
         }
 
         return mortgages;
     }
 
-    public static void updateReceipt(String str, String fileName) throws RuntimeException {
+    public void updateReceipt(String fileName, String str) throws RuntimeException {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
 
@@ -55,11 +74,11 @@ public class FileInterface {
             bufferedWriter.close();
 
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao gravar recibo!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao gravar recibo! -> " + e.getMessage() + "\n");
         }
     }
 
-    public static String getReceipt(String fileName) throws RuntimeException {
+    public String getReceipt(String fileName) throws RuntimeException {
         StringBuilder str = new StringBuilder();
         String line;
 
@@ -72,7 +91,7 @@ public class FileInterface {
             bufferedReader.close();
 
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao ler recibo!\n\n" + e.getMessage());
+            throw new RuntimeException("Erro ao ler recibo! -> " + e.getMessage() + "\n");
         }
 
         return str.toString();
